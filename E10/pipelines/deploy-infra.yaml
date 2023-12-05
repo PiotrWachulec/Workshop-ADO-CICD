@@ -1,0 +1,65 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: 'ResourceGroupNamePrefix'
+    value: 'pw-bicep-ado-training'
+  - name: 'ServiceConnectionName'
+    value: 'Training-DEV-SCN'
+
+stages:
+  - stage: validateDeployment
+    displayName: 'Validate deployment'
+    jobs:
+      - job:
+        strategy:
+          matrix:
+            POLAND_DEV:
+              Location: 'polandcentral'
+              Environment: 'dev'
+            POLAND_PROD:
+              Location: 'polandcentral'
+              Environment: 'prod'
+            WESTEU_DEV:
+              Location: 'westeurope'
+              Environment: 'dev'
+            WESTEU_PROD:
+              Location: 'westeurope'
+              Environment: 'prod'
+        steps:
+          - template: ./modules/validate-deploy-infra-step.yaml
+            parameters:
+              ResourceGroupNamePrefix: $(ResourceGroupNamePrefix)
+              ServiceConnectionName: $(ServiceConnectionName)
+              Location: $(Location)
+              Environment: $(Environment)
+              Validate: true
+
+  - stage: deployInfrastructure
+    displayName: 'Deploy infrastructure'
+    dependsOn: validateDeployment
+    jobs:
+      - job: deployInfrastructure
+        displayName: 'Deploy Infrastructure'
+        strategy:
+          matrix:
+            POLAND_DEV:
+              Location: 'polandcentral'
+              Environment: 'dev'
+            POLAND_PROD:
+              Location: 'polandcentral'
+              Environment: 'prod'
+            WESTEU_DEV:
+              Location: 'westeurope'
+              Environment: 'dev'
+            WESTEU_PROD:
+              Location: 'westeurope'
+              Environment: 'prod'
+        steps:
+          - template: ./modules/validate-deploy-infra-step.yaml
+            parameters:
+              ResourceGroupNamePrefix: $(ResourceGroupNamePrefix)
+              ServiceConnectionName: $(ServiceConnectionName)
+              Location: $(Location)
+              Environment: $(Environment)
+              Validate: false

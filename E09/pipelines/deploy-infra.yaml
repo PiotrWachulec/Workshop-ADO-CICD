@@ -1,0 +1,33 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: 'ResourceGroupName'
+    value: 'pw-bicep-ado-training-dev'
+  - name: 'ServiceConnectionName'
+    value: 'Training-DEV-SCN'
+
+stages:
+  - stage: validateDeployment
+    displayName: 'Validate deployment'
+    jobs:
+      - job:
+        steps:
+          - template: ./modules/validate-deploy-infra-step.yaml
+            parameters:
+              ResourceGroupName: $(ResourceGroupName)
+              ServiceConnectionName: $(ServiceConnectionName)
+              Validate: true
+
+  - stage: deployInfrastructure
+    displayName: 'Deploy infrastructure'
+    dependsOn: validateDeployment
+    jobs:
+      - job: deployInfrastructure
+        displayName: 'Deploy Infrastructure'
+        steps:
+          - template: ./modules/validate-deploy-infra-step.yaml
+            parameters:
+              ResourceGroupName: $(ResourceGroupName)
+              ServiceConnectionName: $(ServiceConnectionName)
+              Validate: false

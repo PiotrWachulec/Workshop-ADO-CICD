@@ -1,0 +1,39 @@
+parameters:
+  - name: ResourceGroupName
+    type: string
+    default: ''
+  - name: ServiceConnectionName
+    type: string
+    default: ''
+  - name: Validate
+    type: boolean
+    default: true
+  - name: Location
+    type: string
+    default: 'polandcentral'
+    values:
+      - 'polandcentral'
+      - 'westeurope'
+  - name: Environment
+    type: string
+    default: 'dev'
+    values:
+      - 'dev'
+      - 'prod'
+    
+
+steps:
+  - task: AzurePowerShell@5
+    inputs:
+      azureSubscription: ${{ parameters.ServiceConnectionName }}
+      ScriptType: 'FilePath'
+      ScriptPath: './scripts/Deploy-Infrastructure.ps1'
+      ScriptArguments: |
+        -ResourceGroupName "${{ parameters.ResourceGroupName }}" `
+        -Validate ${{ parameters.Validate }} `
+        -Location "${{ parameters.Location }}" `
+        -Environment "${{ parameters.Environment }}"
+      azurePowerShellVersion: 'OtherVersion'
+      preferredAzurePowerShellVersion: 10.3.0
+      pwsh: true
+      workingDirectory: '$(Build.SourcesDirectory)'

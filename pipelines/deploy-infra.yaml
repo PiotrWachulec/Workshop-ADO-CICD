@@ -1,0 +1,100 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: 'ResourceGroupNamePrefix'
+    value: 'pw-bicep-ado-training'
+  - name: 'ServiceConnectionNameDEV'
+    value: 'Training-DEV-SCN'
+  - name: 'ServiceConnectionNamePROD'
+    value: 'Training-PROD-SCN'
+
+stages:
+  - stage: validateDeploymentDEV
+    displayName: 'Validate deployment DEV'
+    jobs:
+      - job:
+        strategy:
+          matrix:
+            POLAND_DEV:
+              Location: 'polandcentral'
+              Environment: 'dev'
+            WESTEU_DEV:
+              Location: 'westeurope'
+              Environment: 'dev'
+        steps:
+          - template: ./modules/validate-deploy-infra-step.yaml
+            parameters:
+              ResourceGroupNamePrefix: $(ResourceGroupNamePrefix)
+              ServiceConnectionName: $(ServiceConnectionNameDEV)
+              Location: $(Location)
+              Environment: $(Environment)
+              Validate: true
+
+  - stage: validateDeploymentPROD
+    displayName: 'Validate deployment PROD'
+    dependsOn:
+    jobs:
+      - job:
+        strategy:
+          matrix:
+            POLAND_PROD:
+              Location: 'polandcentral'
+              Environment: 'prod'
+            WESTEU_PROD:
+              Location: 'westeurope'
+              Environment: 'prod'
+        steps:
+          - template: ./modules/validate-deploy-infra-step.yaml
+            parameters:
+              ResourceGroupNamePrefix: $(ResourceGroupNamePrefix)
+              ServiceConnectionName: $(ServiceConnectionNamePROD)
+              Location: $(Location)
+              Environment: $(Environment)
+              Validate: true
+
+  - stage: deployInfrastructureDEV
+    displayName: 'Deploy infrastructure'
+    dependsOn: validateDeploymentDEV
+    jobs:
+      - job: deployInfrastructureDEV
+        displayName: 'Deploy Infrastructure'
+        strategy:
+          matrix:
+            POLAND_DEV:
+              Location: 'polandcentral'
+              Environment: 'dev'
+            WESTEU_DEV:
+              Location: 'westeurope'
+              Environment: 'dev'
+        steps:
+          - template: ./modules/validate-deploy-infra-step.yaml
+            parameters:
+              ResourceGroupNamePrefix: $(ResourceGroupNamePrefix)
+              ServiceConnectionName: $(ServiceConnectionNameDEV)
+              Location: $(Location)
+              Environment: $(Environment)
+              Validate: false
+
+  - stage: deployInfrastructurePROD
+    displayName: 'Deploy infrastructure'
+    dependsOn: validateDeploymentPROD
+    jobs:
+      - job: deployInfrastructurePROD
+        displayName: 'Deploy Infrastructure'
+        strategy:
+          matrix:
+            POLAND_PROD:
+              Location: 'polandcentral'
+              Environment: 'prod'
+            WESTEU_PROD:
+              Location: 'westeurope'
+              Environment: 'prod'
+        steps:
+          - template: ./modules/validate-deploy-infra-step.yaml
+            parameters:
+              ResourceGroupNamePrefix: $(ResourceGroupNamePrefix)
+              ServiceConnectionName: $(ServiceConnectionNamePROD)
+              Location: $(Location)
+              Environment: $(Environment)
+              Validate: false

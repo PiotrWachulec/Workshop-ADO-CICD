@@ -1,0 +1,23 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: 'ResourceGroupName'
+    value: 'pw-bicep-ado-training-dev'
+  - name: 'ServiceConnectionName'
+    value: 'Training-DEV-SCN'
+
+jobs:
+  - job: 
+    displayName: 'Deploy Infrastructure'
+    steps:
+      - task: AzurePowerShell@5
+        inputs:
+          azureSubscription: $(ServiceConnectionName)
+          ScriptType: 'FilePath'
+          ScriptPath: './scripts/Deploy-Infrastructure.ps1'
+          ScriptArguments: '-ResourceGroupName "$(ResourceGroupName)"'
+          azurePowerShellVersion: 'OtherVersion'
+          preferredAzurePowerShellVersion: 10.3.0
+          pwsh: true
+          workingDirectory: '$(Build.SourcesDirectory)'

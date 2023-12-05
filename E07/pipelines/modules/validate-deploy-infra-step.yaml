@@ -1,0 +1,24 @@
+parameters:
+  - name: ResourceGroupName
+    type: string
+    default: ''
+  - name: ServiceConnectionName
+    type: string
+    default: ''
+  - name: Validate
+    type: boolean
+    default: true
+
+steps:
+  - task: AzurePowerShell@5
+    inputs:
+      azureSubscription: ${{ parameters.ServiceConnectionName }}
+      ScriptType: 'FilePath'
+      ScriptPath: './scripts/Deploy-Infrastructure.ps1'
+      ScriptArguments: |
+        -ResourceGroupName "${{ parameters.ResourceGroupName }}" `
+        -Validate ${{ parameters.Validate }}
+      azurePowerShellVersion: 'OtherVersion'
+      preferredAzurePowerShellVersion: 10.3.0
+      pwsh: true
+      workingDirectory: '$(Build.SourcesDirectory)'

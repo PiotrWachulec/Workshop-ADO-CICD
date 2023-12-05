@@ -1,0 +1,14 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: AzurePowerShell@5
+    inputs:
+      azureSubscription: 'Training-DEV-SCN'
+      ScriptType: 'FilePath'
+      ScriptPath: './scripts/Deploy-Infrastructure.ps1'
+      ScriptArguments: '-ResourceGroupName "pw-bicep-ado-training-dev"'
+      azurePowerShellVersion: 'OtherVersion'
+      preferredAzurePowerShellVersion: 10.3.0
+      pwsh: true
+      workingDirectory: '$(Build.SourcesDirectory)'

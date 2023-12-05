@@ -1,0 +1,7 @@
+{
+    "sharedKeyVault": {
+        "subscriptionId": "88a99f8e-abc3-4f87-b5d1-6582ecf72501",
+        "resourceGroupName": "pw-bicep-ado-training-shared",
+        "keyVaultName": "pwbicepadotrainingkv"
+    }
+}
